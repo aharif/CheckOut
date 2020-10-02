@@ -4,8 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Profile from './screens/Profile'
 import Settings from './screens/Settings'
-import MenuSlider from './screens/MenuSlider'
-import ItemList from './screens/ItemList'
 
 import Login from './screens/Login';
 import Scanner from './screens/Scanner';
