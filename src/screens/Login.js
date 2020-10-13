@@ -5,7 +5,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import auth from '@react-native-firebase/auth';
 import Loader from '.././assets/components/Loader';
 import { ViewUtils } from '../Utils'
-import { Text } from 'react-native';
+import { Text,AsyncStorage } from 'react-native';
+import { LoginButton, AccessToken, GraphRequest, GraphRequestManager } from 'react-native-fbsdk';
+import axios from 'axios';
 
 export default class Login extends Component {
 
@@ -17,6 +19,7 @@ export default class Login extends Component {
       isLoading: false,
       username: '',
       password: '',
+      token:''
     }
   }
 
@@ -35,21 +38,22 @@ export default class Login extends Component {
 
     auth()
       .signInWithEmailAndPassword(this.state.username, this.state.password)
-      .then(() => {
+      .then((data) => {
 
         this.props.navigation.navigate('MyDrawer')
         ViewUtils.showToast('You are logged in Successfully!')
+        //this.sendUserToApi();
 
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
           ViewUtils.showToast('That email address is already in use!')
-        
+
         }
 
         if (error.code === 'auth/invalid-email') {
           ViewUtils.showToast('That email address is invalid!')
-      
+
         }
 
         console.error(error);
@@ -61,10 +65,10 @@ export default class Login extends Component {
 
   render() {
     return (
-      <View style={[CommonStyles.container, CommonStyles.bgColor ]}>
+      <View style={[CommonStyles.container, CommonStyles.bgColor]}>
         <KeyboardAwareScrollView style={[CommonStyles.container]}>
 
-          <Image style={[CommonStyles.container, Style.logo, {marginVertical: 50}]} source={require('../assets/img/checkout_logo.png')}></Image>
+          <Image style={[CommonStyles.container, Style.logo, { marginVertical: 50 }]} source={require('../assets/img/checkout_logo.png')}></Image>
           <TextInput
             value={this.state.username}
             onChangeText={val => this.setState({ username: val })}
@@ -74,7 +78,7 @@ export default class Login extends Component {
             enablesReturnKeyAutomatically
             autoCapitalize='none'
             style={Style.input}>
-            </TextInput>
+          </TextInput>
           <TextInput
             value={this.state.password}
             onChangeText={val => this.setState({ password: val })}
@@ -97,6 +101,29 @@ export default class Login extends Component {
               <Text style={Style.btnText}>Create Account</Text>
             </TouchableOpacity>
           </View>
+          <Text style={{alignSelf:'center'}}>Or Login With</Text>
+          <View style={{ alignItems: 'center',marginTop:10}}>
+            
+            <LoginButton
+              onLoginFinished={
+                (error, result) => {
+                  if (error) {
+                    console.log("login has error: " + result.error);
+                  } else if (result.isCancelled) {
+                    console.log("login is cancelled.");
+                  } else {
+                    AccessToken.getCurrentAccessToken().then(
+                      (data) => {
+                        //this.props.navigation.navigate('MyDrawer')
+                        //console.warn("accessToken : ",data.accessToken.toString())
+                        this.initUser()
+                      }
+                    )
+                  }
+                }
+              }
+              onLogoutFinished={() => console.log("logout.")} />
+          </View>
           <Loader loading={this.state.isLoading} />
 
         </KeyboardAwareScrollView>
@@ -105,15 +132,74 @@ export default class Login extends Component {
     );
   }
 
-  componentDidMount() {
-    auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.props.navigation.navigate('MyDrawer')
-      }
-   });
-
+  initUser() {
+    const infoRequest = new GraphRequest(
+      '/me?fields=name,email,picture.type(large)',
+      null,
+      this._responseInfoCallback
+    );
+    new GraphRequestManager().addRequest(infoRequest).start();
   }
+
+ 
+_responseInfoCallback = (error, result) => {
+  if (error) {
+    alert('Error fetching data: ' + error.toString());
+  } else {
+    this._storeData(result)
+    this.props.navigation.navigate('MyDrawer')
+  }
+}
+
+_storeData = async (result) => {
+  let obj = {  
+    name: result.name,  
+    image: result.picture.data.url,  
+  }
+  try {
+    await AsyncStorage.setItem(
+      'user',JSON.stringify(obj)
+    );
+  } catch (error) {
+    // Error saving data
+  }
+};
+
+
+componentDidMount() {  
+  auth().onAuthStateChanged((user) => {
+    if (user) {
+     // this.sendUserToApi(user)
+      this.props.navigation.navigate('MyDrawer')
+    }
+  });
+
+}
   
+async sendUserToApi(user){
+  user.getIdToken().then(function(idToken) {  // <------ Check this line
+    // It shows the Firebase token now
+    console.warn("user token ::",idToken)
+
+  });
+
+ // console.warn("token ::: ",idToken)
+  // const idTokenResult = await auth().currentUser.getIdTokenResult();
+  // console.warn("tokenApi :: ",idTokenResult)
+    // axios.post('https://checkoutapp1.herokuapp.com/api/stripe', {
+    //   token: this.state.tokenId,
+    //   amount: this.state.amount
+    // })
+    //   .then(function (response) {
+    //     // this.setState({ loading: false })      
+    //     console.log(response);
+    //   })
+    //   .catch(function (error) {
+    //     // this.setState({ loading: false })
+    //     console.warn(error);
+    //   });
+
+}
 
   
 
@@ -136,25 +222,25 @@ const Style = StyleSheet.create(
       padding: 15,
       borderBottomColor: '#F5F5F5',
       borderBottomWidth: 2,
-      fontSize: 15, 
+      fontSize: 15,
       alignSelf: 'center'
     },
     btnContainer: {
       width: '90%',
-      marginTop: 70,
+      marginTop: 30,
       alignSelf: 'center',
-    },
-    btnStyle: {
+  },
+  btnStyle: {
       marginVertical: 10,
-      backgroundColor: '#F5F5F5',
+      backgroundColor: '#8BC080',
       borderRadius: 5
-    },
-    btnText: {
+  },
+  btnText: {
       textAlign: 'center',
-      color: '#8BC080',
+      color: '#FFF',
       fontSize: 20,
       padding: 10,
       fontWeight: 'bold'
-    }
+  }
   }
 )
