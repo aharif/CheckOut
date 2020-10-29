@@ -14,10 +14,10 @@ class Bill extends React.Component {
         super(props);
 
         this.state = {
-            bill: props.route.params.res.data,
-            net_amount: 0
 
-        }
+            user: {},
+            bill: props.route.params,
+            net_amount:0
     }
 
     async shareBill() {
