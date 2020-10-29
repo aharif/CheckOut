@@ -13,7 +13,7 @@ import CreateAccount from './screens/CreateAccount';
 import Bill from './screens/Bill';
 import Payment from './screens/Payment';
 import AddFriends from './screens/AddFriends';
-
+import Order from './screens/order';
 
 
 const Stack = createStackNavigator();
@@ -25,6 +25,7 @@ export default class Routes extends React.Component {
     return (
       <Drawer.Navigator drawerContent={props => <MenuSlider {...props} />}>
         <Drawer.Screen name="Home" component={Scanner} />
+        <Drawer.Screen name="Order" component={Order} />
         <Drawer.Screen name="AddFriends" component={AddFriends} />
         <Drawer.Screen name="Profile" component={Profile} />
         <Drawer.Screen name="Settings" component={Settings} />
