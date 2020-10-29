@@ -20,22 +20,14 @@ export default class AddFriends extends Component {
             isLoading: false,
             selected: "",
             userId: '',
-            emailExist: false
+            emailExist: false,
         };
 
 
     }
 
-    componentDidMount() {
-
-        auth().onAuthStateChanged((user) => {
-            if (user) {
-                this.setState({ userId: user.uid })
-            }
-        });
-
+    _getAllUsers(userEmail){
         this.setState({ isLoading: true })
-
 
         database()
             .ref('/Users/')
@@ -47,13 +39,28 @@ export default class AddFriends extends Component {
                     snapshot.forEach(item => {
 
                         const temp = item.val();
-                        emails.push(temp);
+                        if(temp.email !== userEmail){
+                            emails.push(temp);
+                        }
+                        
                     });
                     this.setState({ emails: emails })
                 }else{
                     ViewUtils.showToast('No Record Found')
                 }
             });
+    }
+
+    componentDidMount() {
+        
+        auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({ userId: user.uid })
+                this._getAllUsers(user.email)
+            }
+        });
+        
+       
 
     }
 
@@ -110,7 +117,6 @@ export default class AddFriends extends Component {
                 </View>
 
                 <Loader loading={this.state.isLoading} />
-
                 <View
                     style={[
                         CommonStyles.backButtonStyle
@@ -137,6 +143,7 @@ export default class AddFriends extends Component {
             ViewUtils.showAlert('Please select a Friend to add.')
             return;
         }
+        this.setState({ isLoading: true })
 
         this.setState({ isLoading: true })
 
@@ -144,7 +151,7 @@ export default class AddFriends extends Component {
             .ref(`/Groups/${this.state.userId}/Friends/`)
             .once("value")
             .then(async snapshot => {
-
+          
                 this.setState({ isLoading: false })
 
                 if(snapshot != null){
