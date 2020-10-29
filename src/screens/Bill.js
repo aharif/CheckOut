@@ -12,9 +12,9 @@ class Bill extends React.Component {
         super(props);
 
         this.state = {
-            // bill: props.route.params.res.data,
-            //             net_amount:0
-            bill: []
+            user: {},
+            bill: props.route.params,
+            net_amount:0
         }
 
         // console.warn("my billll -- ",this.state.bill)
