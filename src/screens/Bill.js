@@ -5,10 +5,10 @@ import { Icon, Input } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import axios from 'axios';
 import { ViewUtils } from '../Utils';
+
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Loader from '.././assets/components/Loader';
-
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -18,6 +18,7 @@ class Bill extends React.Component {
         super(props);
 
         this.state = {
+
             isLoading: false,
             user: {},
             allBills: props.route.params.res.data,
@@ -113,6 +114,7 @@ class Bill extends React.Component {
         // this.state.myBill = myBill[0].foodItem
         // this.state.net_amount = myBill[0].amount
 
+
         return (
             <View style={Style.container}>
                 <KeyboardAwareScrollView style={Style.container}>
@@ -151,9 +153,11 @@ class Bill extends React.Component {
                             renderItem={({ item }) => (
                                 <View>
                                     <View style={{ flexDirection: 'row', }}>
+
                                         <Text style={{ flex: 1, fontSize: 16,color:'#8BC080' }}>{item.item}</Text>
                                         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
                                             <Text style={{fontSize: 16,color:'#8BC080'}}>${item.price}</Text>
+
                                         </View>
 
                                     </View>
@@ -163,6 +167,7 @@ class Bill extends React.Component {
                     </View>
                     <View style={{ marginTop: 40, marginLeft: 10 }}>
                         <View>
+
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end',marginRight:10 }}>
                             <Text style={{ fontSize: 20,color:'#8BC080' }}>Total = ${this.state.net_amount}</Text>
                             </View>

@@ -37,6 +37,7 @@ export default class AddFriends extends Component {
                 if(snapshot.val()){
                     let emails = [];
                     snapshot.forEach(item => {
+
                         const temp = item.val();
                         if(temp.email !== userEmail){
                             emails.push(temp);
@@ -47,7 +48,6 @@ export default class AddFriends extends Component {
                 }else{
                     ViewUtils.showToast('No Record Found')
                 }
-                
             });
     }
 
@@ -115,6 +115,7 @@ export default class AddFriends extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+
                 <Loader loading={this.state.isLoading} />
                 <View
                     style={[
@@ -144,10 +145,13 @@ export default class AddFriends extends Component {
         }
         this.setState({ isLoading: true })
 
+        this.setState({ isLoading: true })
+
         database()
             .ref(`/Groups/${this.state.userId}/Friends/`)
             .once("value")
             .then(async snapshot => {
+          
                 this.setState({ isLoading: false })
 
                 if(snapshot != null){
